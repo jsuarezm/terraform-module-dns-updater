@@ -40,7 +40,11 @@ terraform {
   }
 }
 
-
+provider "dns" {
+  update {
+    server = "127.0.0.1"
+  }
+}
 # ------------------------------------------
 # Write your local resources here
 # ------------------------------------------
@@ -64,3 +68,4 @@ resource "dns_a_record_set" "www" {
   ]
   ttl = 300
 }
+
