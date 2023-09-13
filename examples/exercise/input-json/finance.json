@@ -1,8 +1,6 @@
 {
-    "addresses": [
-        "192.168.100.1"
-    ],
-    "ttl": 60,
-    "zone": "example.com.",
-    "dns_record_type": "a"
+  "addresses": ["192.168.100.1", "192.168.100.3"],
+  "ttl": 60,
+  "zone": "example.com.",
+  "dns_record_type": "a"
 }

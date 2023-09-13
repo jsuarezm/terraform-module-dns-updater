@@ -40,16 +40,15 @@ terraform {
   }
 }
 
-provider "dns" {
-  update {
-    server = "127.0.0.1"
-  }
-}
 # ------------------------------------------
 # Write your local resources here
 # ------------------------------------------
 
 locals {
+
+  json_files = fileset(path.root, "${var.input-json-dir}/*.json")
+
+  json_data = length(local.json_files) > 0 ? toset([for f in local.json_files : merge(jsondecode(file("${path.root}/${f}")),{name=trimsuffix(basename("${f}"),".json")})]) : toset([var.default_a_entry])
 
 }
 
@@ -58,14 +57,41 @@ locals {
 # Write your Terraform resources here
 # ------------------------------------------
 
-resource "dns_a_record_set" "www" {
-  zone = "example.com."
-  name = "www"
-  addresses = [
-    "192.168.0.1",
-    "192.168.0.2",
-    "192.168.0.3",
-  ]
-  ttl = 300
+# resource "dns_a_record_set" "www" {
+#   zone = "example.com."
+#   name = "www"
+#   addresses = [
+#     "192.168.0.1",
+#     "192.168.0.2",
+#     "192.168.0.3",
+#   ]
+#   ttl = 300
+# }
+
+resource "dns_a_record_set" "entries" {
+  for_each   = {
+    for index, entry in local.json_data:
+    entry.name => entry
+  } 
+  zone = each.value.zone
+  name = each.value.name
+  addresses = each.value.addresses
+  ttl = tonumber(each.value.ttl)
 }
 
+output "input_path" {
+  value = var.input-json-dir
+}
+
+
+output "entry_files" {
+  value = local.json_files
+}
+
+output "entries_processed" {
+  value = local.json_data
+}
+
+output "dentry" {
+  value = toset([var.default_a_entry])
+}
