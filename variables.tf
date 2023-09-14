@@ -2,11 +2,13 @@
 # Write your Terraform variable inputs here
 # ------------------------------------------
 
+
 variable "input-json-dir" {
-  description = "path of the directory with JSON files with the DNS entries"
+  description = "Input of directory name containing the JSON files with the DNS entries"
 }
 
 variable "default_a_entry" {
+  description = "Default DNS entry, in case there are not JSON files with entries, or wrong directory name"
   type = object({
     name       = string
     zone       = string

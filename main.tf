@@ -1,20 +1,39 @@
 /**
-* # Terraform
 *
-* <Short TF module description>
+* # Terraform Coding Exercise
+*
+* Please read the [instructions](./INSTRUCTIONS.md) file.
+*
+* # Steps
+*
+* 
+*
+* # Terraform Module dns_updater
+*
+* This terraform module is intended to configure in the DNS server with the entries in a dynamic way.
+* 
+*  ## Usage
+*  
+*  - In the root terraform manifest, it is necessary to call this module
+*  - It is also necessary to provide the name, en relative path to the directory containing the JSON files with the DNS entries
+*  - In case this JSON directory is not provided, the module will use the default entry value.
+*  - After run terraform command in the dorectory root, with the options init, plan and apply, the DNS entries into the JSON directory will be configured in the DNS server.
 *
 *
-* ## Usage
+*  ## DISCLAIMER
 *
-* ### Quick Example
+*  This module is still a test, so it lacks of security measures to configure the DNS Server in a dynamic way, and also, it lacks of automation to be deployed.
 *
-* ```hcl
-* module "dns_" {
-*   source = ""
-*   input1 = <>
-*   input2 = <>
-* } 
-* ```
+*  ## Locals variables
+*
+* - The json_files variable, set the relative path to the JSON Directory, and get all files with json extension inside it.
+* - The json_variable, evaluate if the JSON Directory has files or it is a wrong path, in that case, it configure the default entry. In case, the JSON files exists, each one are going to be parsed and mapped in json format to be processed.
+*
+* ## dns_a_record_set resource
+*
+* - The resource is using the public provider hashicorp/dns.
+* - Only can be used to create entries type A into the DNS Server
+* - This resource iterate in all values provided by the DNS JSON files and perform the configuration in the DNS Server configured
 *
 */
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -44,6 +63,7 @@ terraform {
 # Write your local resources here
 # ------------------------------------------
 
+
 locals {
 
   json_files = fileset(path.root, "${var.input-json-dir}/*.json")
@@ -57,17 +77,6 @@ locals {
 # Write your Terraform resources here
 # ------------------------------------------
 
-# resource "dns_a_record_set" "www" {
-#   zone = "example.com."
-#   name = "www"
-#   addresses = [
-#     "192.168.0.1",
-#     "192.168.0.2",
-#     "192.168.0.3",
-#   ]
-#   ttl = 300
-# }
-
 resource "dns_a_record_set" "entries" {
   for_each   = {
     for index, entry in local.json_data:
@@ -79,19 +88,3 @@ resource "dns_a_record_set" "entries" {
   ttl = tonumber(each.value.ttl)
 }
 
-output "input_path" {
-  value = var.input-json-dir
-}
-
-
-output "entry_files" {
-  value = local.json_files
-}
-
-output "entries_processed" {
-  value = local.json_data
-}
-
-output "dentry" {
-  value = toset([var.default_a_entry])
-}
