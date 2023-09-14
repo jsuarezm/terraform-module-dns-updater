@@ -5,6 +5,17 @@ Please read the [instructions](./INSTRUCTIONS.md) file.
 
 # Steps
 
+- [x] Clone a local repository
+- [x] Analyze the current functionality and code, test it
+*	- [x] Run test environment
+- [x] Analyze the requirement, questions, what is it the interpretation about them? Make assumptions
+- [x] Build script to parser the json files and output the DNS registry statement
+- [x] Implement the dynamic configuration for A type entries
+- [x] Document the README.md using terraform docs
+- [x] Implement the dynamic configuration for CNAME type entries and update the documentation
+- [x] Add Improvements
+- [x] publish in Github
+
 # Terraform Module dns\_updater
 
 This terraform module is intended to configure in the DNS server with the entries in a dynamic way.
@@ -23,7 +34,7 @@ This terraform module is intended to configure in the DNS server with the entrie
  ## Locals variables
 
 - The json\_files variable, set the relative path to the JSON Directory, and get all files with json extension inside it.
-- The json\_variable, evaluate if the JSON Directory has files or it is a wrong path, in that case, it configure the default entry. In case, the JSON files exists, each one are going to be parsed and mapped in json format to be processed.
+- The json\_a\_data and json\_cname\_data variables, both evaluate if the JSON Directory has files or it is a wrong path, in that case, it configure the default entry. In case, the JSON files exists, each one are going to be parsed and mapped in json format to be processed.
 
 ## dns\_a\_record\_set resource
 
@@ -53,12 +64,14 @@ No modules.
 | Name | Type |
 |------|------|
 | [dns_a_record_set.entries](https://registry.terraform.io/providers/hashicorp/dns/latest/docs/resources/a_record_set) | resource |
+| [dns_cname_record.cname_entries](https://registry.terraform.io/providers/hashicorp/dns/latest/docs/resources/cname_record) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_default_a_entry"></a> [default\_a\_entry](#input\_default\_a\_entry) | Default DNS entry, in case there are not JSON files with entries, or wrong directory name | <pre>object({<br>    name       = string<br>    zone       = string<br>    addresses  = list(string)<br>    ttl        = number<br>    dns_record_type = string<br>  })</pre> | <pre>{<br>  "addresses": [<br>    "192.168.0.1",<br>    "192.168.0.2",<br>    "192.168.0.3"<br>  ],<br>  "dns_record_type": "a",<br>  "name": "www",<br>  "ttl": 300,<br>  "zone": "example.com."<br>}</pre> | no |
+| <a name="input_default_cname_entry"></a> [default\_cname\_entry](#input\_default\_cname\_entry) | Default DNS entry, in case there are not JSON files with entries, or wrong directory name | <pre>object({<br>    name       = string<br>    zone       = string<br>    cname      = string<br>    ttl        = number<br>    dns_record_type = string<br>  })</pre> | <pre>{<br>  "cname": "xxx.example.com.",<br>  "dns_record_type": "cname",<br>  "name": "cname",<br>  "ttl": 300,<br>  "zone": "example.com."<br>}</pre> | no |
 | <a name="input_input-json-dir"></a> [input-json-dir](#input\_input-json-dir) | Input of directory name containing the JSON files with the DNS entries | `any` | n/a | yes |
 
 ## Outputs

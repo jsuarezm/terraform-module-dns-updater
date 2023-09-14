@@ -28,3 +28,21 @@ variable "default_a_entry" {
     dns_record_type = "a"
   }
 } 
+
+variable "default_cname_entry" {
+  description = "Default DNS entry, in case there are not JSON files with entries, or wrong directory name"
+  type = object({
+    name       = string
+    zone       = string
+    cname      = string
+    ttl        = number
+    dns_record_type = string
+  })
+  default = {
+    name = "cname"
+    zone = "example.com."
+    cname = "xxx.example.com."
+    ttl = 300
+    dns_record_type = "cname"
+  }
+} 

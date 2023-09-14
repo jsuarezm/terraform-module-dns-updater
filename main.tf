@@ -6,7 +6,16 @@
 *
 * # Steps
 *
-* 
+* - [x] Clone a local repository
+* - [x] Analyze the current functionality and code, test it
+*	- [x] Run test environment
+* - [x] Analyze the requirement, questions, what is it the interpretation about them? Make assumptions
+* - [x] Build script to parser the json files and output the DNS registry statement
+* - [x] Implement the dynamic configuration for A type entries
+* - [x] Document the README.md using terraform docs
+* - [x] Implement the dynamic configuration for CNAME type entries and update the documentation
+* - [x] Add Improvements
+* - [x] publish in Github
 *
 * # Terraform Module dns_updater
 *
@@ -27,7 +36,7 @@
 *  ## Locals variables
 *
 * - The json_files variable, set the relative path to the JSON Directory, and get all files with json extension inside it.
-* - The json_variable, evaluate if the JSON Directory has files or it is a wrong path, in that case, it configure the default entry. In case, the JSON files exists, each one are going to be parsed and mapped in json format to be processed.
+* - The json_a_data and json_cname_data variables, both evaluate if the JSON Directory has files or it is a wrong path, in that case, it configure the default entry. In case, the JSON files exists, each one are going to be parsed and mapped in json format to be processed. 
 *
 * ## dns_a_record_set resource
 *
@@ -36,9 +45,6 @@
 * - This resource iterate in all values provided by the DNS JSON files and perform the configuration in the DNS Server configured
 *
 */
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -68,8 +74,9 @@ locals {
 
   json_files = fileset(path.root, "${var.input-json-dir}/*.json")
 
-  json_data = length(local.json_files) > 0 ? toset([for f in local.json_files : merge(jsondecode(file("${path.root}/${f}")),{name=trimsuffix(basename("${f}"),".json")})]) : toset([var.default_a_entry])
+  json_a_data = length(local.json_files) > 0 ? toset([for f in local.json_files : merge(jsondecode(file("${path.root}/${f}")),{name=trimsuffix(basename("${f}"),".json")}) if lookup(jsondecode(file("${path.root}/${f}")),"dns_record_type", "NO") == "a"]) : toset([var.default_a_entry])
 
+    json_cname_data = length(local.json_files) > 0 ? toset([for f in local.json_files : merge(jsondecode(file("${path.root}/${f}")),{name=trimsuffix(basename("${f}"),".json")}) if lookup(jsondecode(file("${path.root}/${f}")),"dns_record_type", "NO") == "cname"]) : toset([var.default_cname_entry])
 }
 
 
@@ -79,8 +86,9 @@ locals {
 
 resource "dns_a_record_set" "entries" {
   for_each   = {
-    for index, entry in local.json_data:
+    for index, entry in local.json_a_data:
     entry.name => entry
+    if entry.dns_record_type == "a"
   } 
   zone = each.value.zone
   name = each.value.name
@@ -88,3 +96,14 @@ resource "dns_a_record_set" "entries" {
   ttl = tonumber(each.value.ttl)
 }
 
+resource "dns_cname_record" "cname_entries" {
+  for_each   = {
+    for index, entry in local.json_cname_data:
+    entry.name => entry
+    if entry.dns_record_type == "cname"
+  } 
+  zone = each.value.zone
+  name = each.value.name
+  cname = each.value.cname
+  ttl = tonumber(each.value.ttl)
+}

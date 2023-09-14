@@ -14,7 +14,7 @@ output "entry_files" {
 
 output "entries_processed" {
   description = "JSON of all entries processed"
-  value = local.json_data
+  value = local.json_a_data
 }
 
 output "dentry" {
