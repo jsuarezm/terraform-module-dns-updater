@@ -5,16 +5,16 @@ Please read the [instructions](./INSTRUCTIONS.md) file.
 
 # Steps
 
-- [x] Clone a local repository
-- [x] Analyze the current functionality and code, test it
-*	- [x] Run test environment
-- [x] Analyze the requirement, questions, what is it the interpretation about them? Make assumptions
-- [x] Build script to parser the json files and output the DNS registry statement
-- [x] Implement the dynamic configuration for A type entries
-- [x] Document the README.md using terraform docs
-- [x] Implement the dynamic configuration for CNAME type entries and update the documentation
-- [x] Add Improvements
-- [x] publish in Github
+- Clone a local repository
+- Analyze the current functionality and code, test it
+- Run test environment
+- Analyze the requirement, questions, what is it the interpretation about them? Make assumptions
+- Build script to parser the json files and output the DNS registry statement
+- Implement the dynamic configuration for A type entries
+- Document the README.md using terraform docs
+- Implement the dynamic configuration for CNAME type entries and update the documentation
+- Add Improvements
+- publish in Github
 
 # Terraform Module dns\_updater
 
@@ -41,6 +41,10 @@ This terraform module is intended to configure in the DNS server with the entrie
 - The resource is using the public provider hashicorp/dns.
 - Only can be used to create entries type A into the DNS Server
 - This resource iterate in all values provided by the DNS JSON files and perform the configuration in the DNS Server configured
+
+# IMPROVEMENTS
+
+Please read the [improvements](./IMPROVEMENTS.md) file.
 
 ## Requirements
 
